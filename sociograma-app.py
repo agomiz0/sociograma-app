@@ -85,7 +85,22 @@ if st.button("📊 Generar sociogramas"):
                 for destino in destinos:
                     G.add_edge(origen, destino)
 
-            fig, ax = plt.subplots(figsize=(6, 6))
+            # Calcular tamaño de nodos según popularidad (in-degree)
+            in_degrees = dict(G.in_degree())
+            sizes = [300 + in_degrees[n]*300 for n in G.nodes()]
+
+            # Colores: rojo para aislados
+            colors = ['red' if G.degree(n) == 0 else 'skyblue' for n in G.nodes()]
+
+            # Layout mejorado (orgánico, más espaciado)
+            pos = nx.spring_layout(G, seed=42, k=1.5, iterations=200)
+
+            fig, ax = plt.subplots(figsize=(7, 7))
+            nx.draw_networkx_nodes(G, pos, node_color=colors, node_size=sizes, alpha=0.9)
+            nx.draw_networkx_edges(G, pos, edge_color="gray", arrows=True, arrowstyle='-|>', min_source_margin=15, min_target_margin=15)
+            nx.draw_networkx_labels(G, pos, font_size=9)
+            plt.axis('off')
+            st.pyplot(fig)
             pos = nx.spring_layout(G, seed=42)
             nx.draw(G, pos, with_labels=True, node_color="skyblue", node_size=2000, font_size=10, edge_color="gray", arrows=True)
             st.pyplot(fig)
